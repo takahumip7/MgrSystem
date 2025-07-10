@@ -2,6 +2,7 @@ package com.example.demo.authentication;
 
 import java.time.LocalDateTime;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
@@ -23,10 +24,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	private final UserInfoRepository repository;
 	
 	/** アカウントロックを行うログイン失敗回数境界値 */
-	private final int LOCKING_BORDER_COUNT = 3;
+	@Value("${security.locking-border-count}")
+	private int lockingBorderCount;
 	
 	/** アカウントロックの継続時間 */
-	private final int LOCKING_TIME = 1;
+	@Value("${security.locking-time}")
+	private int lockingTime;
 
 	/**
 	 * ユーザー情報生成
@@ -40,11 +43,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 				.orElseThrow(() -> new UsernameNotFoundException(username));
 		
 		LocalDateTime accountLockedTime = userInfo.getAccountLockedTime();
-		boolean isAccountLocked = accountLockedTime != null && accountLockedTime.plusHours(LOCKING_TIME).isAfter(LocalDateTime.now());
+		boolean isAccountLocked = accountLockedTime != null && accountLockedTime.plusHours(lockingTime).isAfter(LocalDateTime.now());
 
 		return User.withUsername(userInfo.getLoginId())
 				.password(userInfo.getPassword())
-				.roles("USER")
+				.authorities(userInfo.getAuthority())
 				.disabled(userInfo.isDisabled())
 				.accountLocked(isAccountLocked)
 				.build();
@@ -60,7 +63,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		String loginId = event.getAuthentication().getName();
 		repository.findById(loginId).ifPresent(userInfo -> {
 			repository.save(userInfo.incrementLoginFailureCount());
-			boolean isReachFailureCount = userInfo.getLoginFailureCount() == LOCKING_BORDER_COUNT;
+			boolean isReachFailureCount = userInfo.getLoginFailureCount() == lockingBorderCount;
 			if(isReachFailureCount) {
 				repository.save(userInfo.updateAccountLocked());
 			}
