@@ -22,7 +22,7 @@ public class MenuController {
 	 */
 	@GetMapping(UrlConst.MENU)
 	public String view(@AuthenticationPrincipal User user, Model model) {
-		boolean hasUserManageAuth = user.getAuthorities().stream().allMatch(authority -> authority.getAuthority().equals(AuthorityKind.ITEM_AND_USER_MANAGER.getAuthorityKind()));
+		boolean hasUserManageAuth = user.getAuthorities().stream().allMatch(authority -> authority.getAuthority().equals(AuthorityKind.ITEM_AND_USER_MANAGER.getCode()));
 		model.addAttribute("hasUserManageAuth", hasUserManageAuth);
 		return "menu";
 	}

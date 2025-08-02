@@ -1,0 +1,5 @@
+@charset "UTF-8";
+.table-active {
+	background-color: #cce5ff; /* 選択行の背景色を設定 */
+	--bs-table-bg: #cce5ff;
+}

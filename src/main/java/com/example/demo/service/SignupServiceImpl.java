@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -7,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.constant.AuthorityKind;
+import com.example.demo.constant.UserStatusKind;
 import com.example.demo.entity.UserInfo;
 import com.example.demo.form.SignupForm;
 import com.example.demo.repository.UserInfoRepository;
@@ -39,7 +41,11 @@ public class SignupServiceImpl implements SignupService {
 		userInfo.setLoginId(form.getLoginId());
 		String encodedPassword = passwordEncoder.encode(form.getPassword()); //ハッシュ化パスワードの生成
 		userInfo.setPassword(encodedPassword);
-		userInfo.setAuthority(AuthorityKind.ITEM_WATCHER.getAuthorityKind());
+		userInfo.setUserStatusKind(UserStatusKind.ENABLED);
+		userInfo.setAuthorityKind(AuthorityKind.ITEM_WATCHER);
+		userInfo.setCreateTime(LocalDateTime.now());
+		userInfo.setUpdateTime(LocalDateTime.now());
+		userInfo.setUpdateUser(form.getLoginId());
 
 		return Optional.of(repository.save(userInfo));
 	}

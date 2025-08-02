@@ -2,7 +2,13 @@ package com.example.demo.entity;
 
 import java.time.LocalDateTime;
 
+import com.example.demo.constant.AuthorityKind;
+import com.example.demo.constant.UserStatusKind;
+import com.example.demo.entity.converter.UserAuthorityConverter;
+import com.example.demo.entity.converter.UserStatusConverter;
+
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -34,13 +40,27 @@ public class UserInfo {
 	@Column(name = "account_locked_time")
 	private LocalDateTime accountLockedTime;
 	
-	/** 利用可能か（true:利用可能） */
+	/** ユーザー状態種別 */
 	@Column(name = "is_disabled")
-	private boolean isDisabled;
+	@Convert(converter = UserStatusConverter.class)
+	private UserStatusKind userStatusKind;
 	
 	/** ユーザ権限 */
-	@Column
-	private String authority;
+	@Column(name = "authority")
+	@Convert(converter = UserAuthorityConverter.class)
+	private AuthorityKind authorityKind;
+	
+	/** 登録日時 */
+	@Column(name = "create_time")
+	private LocalDateTime createTime;
+	
+	/** 最終更新日時 */
+	@Column(name = "update_time")
+	private LocalDateTime updateTime;
+	
+	/** 最終更新ユーザー */
+	@Column(name = "update_user")
+	private String updateUser;
 	
 	public UserInfo() {}
 	
@@ -50,7 +70,7 @@ public class UserInfo {
 	 * @return ログイン失敗回数がインクリメントされたUserInfo
 	 */
 	public UserInfo incrementLoginFailureCount() {
-		return new UserInfo(loginId, password, ++loginFailureCount, accountLockedTime, isDisabled, authority);
+		return new UserInfo(loginId, password, ++loginFailureCount, accountLockedTime, userStatusKind, authorityKind, createTime, updateTime, updateUser);
 	}
 	
 	/**
@@ -59,7 +79,7 @@ public class UserInfo {
 	 * @return ログイン失敗情報がリセットされたUserInfo
 	 */
 	public UserInfo resetLoginFailureCount() {
-		return new UserInfo(loginId, password, 0, null, isDisabled, authority);
+		return new UserInfo(loginId, password, 0, null, userStatusKind, authorityKind, createTime, updateTime, updateUser);
 	}
 	
 	/**
@@ -68,6 +88,6 @@ public class UserInfo {
 	 * @return ログイン失敗階位数、アカウントロック日時が更新されたUserInfo
 	 */
 	public UserInfo updateAccountLocked() {
-		return new UserInfo(loginId, password, 0, LocalDateTime.now(), isDisabled, authority);
+		return new UserInfo(loginId, password, 0, LocalDateTime.now(), userStatusKind, authorityKind, createTime, updateTime, updateUser);
 	}
 }

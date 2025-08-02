@@ -17,4 +17,10 @@ public class MessageConst {
 	/** ユーザ登録画面：ユーザ登録完了 */
 	public static final String Signup_Regist_Succeed = "signup.registSucceed";
 	
+	/** ユーザー一覧画面：存在しないログインID */
+	public static final String USERLIST_NON_EXISTED_LOGIN_ID = "userList.nonExistedLoginId";
+
+	/** ユーザー一覧画面：ユーザー削除完了 */
+	public static final String USERLIST_DELETE_SUCCEED = "userList.deleteSucceed";
+	
 }
